@@ -1,0 +1,99 @@
+variable "subscription_id" {
+  description = "The Azure subscription ID where the resources will be deployed."
+  type        = string
+}
+
+variable "naming_convention" {
+  description = "Naming convention for the resources."
+  type        = string
+  default     = "{workload_name}-{environment}-{resource_type}-{region}-{instance}"
+}
+
+variable "workload_name" {
+  description = "The name of the workload. Will be used for resource names if `{workload_name}` is present in the naming convention."
+  type        = string
+}
+
+variable "environment" {
+  description = "The environment for the deployment. Will be used for resource names if `{environment}` is present in the naming convention."
+  type        = string
+  default     = "test"
+}
+
+variable "instance" {
+  description = "Instance number for the deployment. Will be used for resource names if `{instance}` is present in the naming convention."
+  type        = number
+  default     = 1
+}
+
+variable "location" {
+  description = "The Azure region where the resources will be deployed."
+  type        = string
+  default     = "eastus2"
+}
+
+variable "tags" {
+  description = "Tags to apply to the resources."
+  type        = map(string)
+  default     = {}
+}
+
+variable "enable_telemetry" {
+  description = "Enable telemetry for the Azure Verified Modules."
+  type        = bool
+  default     = true
+}
+
+variable "always_use_short_region_name" {
+  description = "Whether to always use the short region name in the resource name, even if using the full region name doesn't exceed the resource type's maximum length."
+  type        = bool
+  default     = false
+}
+
+variable "pip_domain_name_label" {
+  description = "Domain name label prefix for the public IP address."
+  type        = string
+  default     = ""
+}
+
+variable "instance_formatted_length" {
+  description = "Length of the formatted instance number."
+  type        = number
+  default     = 2
+}
+
+variable "kv_certificate_name" {
+  description = "Name of the Key Vault certificate."
+  type        = string
+  default     = "appgw-certificate"
+}
+
+variable "certificate_pfx_path" {
+  description = "Path to the certificate file (PFX) to be imported into Key Vault."
+  type        = string
+  default     = ""
+}
+
+variable "certificate_pfx_password" {
+  description = "Password for the PFX certificate file."
+  type        = string
+  default     = ""
+  sensitive   = true
+  // TODO: validate ends in .pfx
+}
+
+variable "vnet_address_space" {
+  description = "Address space for the new Virtual Network."
+  type        = list(string)
+
+  validation {
+    condition     = length(var.vnet_address_space) > 0 && alltrue([for cidr in var.vnet_address_space : can(cidrhost(cidr, 0))])
+    error_message = "vnet_address_space must be a non-empty list of valid CIDR blocks."
+  }
+}
+
+variable "applicationgatewaysubnet_cidr" {
+  description = "CIDR for the Application Gateway subnet."
+  type        = number
+  default     = 26
+}
