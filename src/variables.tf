@@ -97,3 +97,50 @@ variable "applicationgatewaysubnet_cidr" {
   type        = number
   default     = 26
 }
+
+variable "application_gateway_sku" {
+  description = "SKU for the Application Gateway."
+  type        = string
+  default     = "WAF_v2"
+}
+
+variable "agw_configuration" {
+  description = "Configuration settings for the Application Gateway."
+  type = object({
+    listeners = map(object({
+      protocol           = string
+      frontend_host_name = string
+      backend_host_name  = optional(string)
+      backend_pool       = string
+      backend_port       = optional(number)
+    }))
+    create_http_to_https_redirects = optional(bool, true)
+    backend_pools = map(object({
+      fqdns                        = optional(list(string), [])
+      ip_addresses                 = optional(list(string), [])
+      backend_cert_public_key_file = optional(string, "")
+    }))
+  })
+  default = {
+    listeners = {
+      first_site = {
+        protocol           = "Https"
+        frontend_host_name = "example.com"
+        backend_host_name  = "internal.example.com"
+
+        // Reference to the backend pool key defined below
+        backend_pool = "first_pool"
+      }
+    }
+
+    create_http_to_https_redirects = true
+
+    backend_pools = {
+      first_pool = {
+        fqdns = ["internal.example.com"]
+        // -- OR --
+        ip_addresses = ["10.0.1.4"]
+      }
+    }
+  }
+}

@@ -15,4 +15,5 @@ locals {
   rg_name   = module.rg_name.resource_name
   kv_name   = length(var.kv_name) == 0 ? module.kv_name.resource_name : var.kv_name
   vnet_name = length(var.vnet_name) == 0 ? module.vnet_name.resource_name : var.vnet_name
+  agw_name  = module.agw_name.resource_name
 }
