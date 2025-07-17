@@ -32,6 +32,8 @@ locals {
         enable_connection_draining = true
         drain_timeout_sec          = 30
       }
+
+      trusted_root_certificate_names = var.agw_configuration.backend_pools[listener.backend_pool].backend_cert_public_key_file != "" ? [local.trusted_root_certificate[base64encode(var.agw_configuration.backend_pools[listener.backend_pool].backend_cert_public_key_file)].name] : null
     }
     # TODO: Remove duplicate settings
   }
@@ -97,8 +99,24 @@ locals {
       target_listener_name = local.https_listeners["${name}-${listener.protocol}"].name
     } if listener.protocol == "Https" && var.agw_configuration.create_http_to_https_redirects
   }
+
+  unique_public_key_file = distinct([for pool in var.agw_configuration.backend_pools :
+    {
+      file = pool.backend_cert_public_key_file
+    } if pool.backend_cert_public_key_file != ""
+  ])
+
+  trusted_root_certificate = { for i, cert in local.unique_public_key_file :
+    base64encode(cert.file) => {
+      name = "root-cert-${i}"
+      data = file(cert.file) // Assumes the contents are already base64 encoded PEM
+    }
+  }
 }
 
+output "root_cert" {
+  value = local.trusted_root_certificate
+}
 output "bep" {
   value = local.backend_address_pools
 }
@@ -160,6 +178,8 @@ module "application_gateway" {
   }
 
   backend_address_pools = local.backend_address_pools
+
+  trusted_root_certificate = local.trusted_root_certificate
 
   # Backend http settings configuration for the application gateway
   backend_http_settings = local.backend_http_settings
