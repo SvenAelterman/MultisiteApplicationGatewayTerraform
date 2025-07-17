@@ -1,4 +1,3 @@
-
 module "keyvault" {
   source  = "Azure/avm-res-keyvault-vault/azurerm"
   version = "~> 0.10.0"
