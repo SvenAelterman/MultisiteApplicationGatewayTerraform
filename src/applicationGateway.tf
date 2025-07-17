@@ -35,7 +35,6 @@ locals {
 
       trusted_root_certificate_names = var.agw_configuration.backend_pools[listener.backend_pool].backend_cert_public_key_file != "" ? [local.trusted_root_certificate[base64encode(var.agw_configuration.backend_pools[listener.backend_pool].backend_cert_public_key_file)].name] : null
     }
-    # TODO: Remove duplicate settings
   }
 
   // Create the object structure for the backend_http_settings variable for the module
@@ -112,25 +111,6 @@ locals {
       data = file(cert.file) // Assumes the contents are already base64 encoded PEM
     }
   }
-}
-
-output "root_cert" {
-  value = local.trusted_root_certificate
-}
-output "bep" {
-  value = local.backend_address_pools
-}
-
-output "httpsettings" {
-  value = local.backend_http_settings
-}
-
-output "listeners" {
-  value = local.all_listeners
-}
-
-output "routing_rules" {
-  value = local.all_routing_rules
 }
 
 module "application_gateway" {

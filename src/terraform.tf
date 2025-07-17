@@ -23,3 +23,9 @@ provider "azurerm" {
   storage_use_azuread = true
   subscription_id     = local.subscription_id
 }
+
+provider "azurerm" {
+  alias           = "dns_subscription"
+  subscription_id = var.dns_subscription_id
+  features {}
+}

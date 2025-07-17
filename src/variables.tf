@@ -144,3 +144,18 @@ variable "agw_configuration" {
     }
   }
 }
+
+variable "dns_subscription_id" {
+  description = "The subscription ID for the public DNS zone."
+  type        = string
+}
+
+variable "dns_zone_name" {
+  description = "The name of the public DNS zone."
+  type        = string
+}
+
+variable "dns_resource_group_name" {
+  description = "The name of the resource group where the DNS zone is located."
+  type        = string
+}
