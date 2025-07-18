@@ -159,3 +159,8 @@ variable "dns_resource_group_name" {
   description = "The name of the resource group where the DNS zone is located."
   type        = string
 }
+
+variable "virtual_hub_id" {
+  description = "The ID of the vWAN Virtual Hub to connect the new Virtual Network to."
+  type        = string
+}

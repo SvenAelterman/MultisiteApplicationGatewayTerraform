@@ -5,9 +5,11 @@
     "applicationgatewaysubnet",
     "kvsu",
     "managedidentity",
+    "networksecuritygroup",
     "publicipaddress",
     "resourcegroup",
     "userassignedidentity",
-    "versionless"
+    "versionless",
+    "virtualwan"
   ]
 }
