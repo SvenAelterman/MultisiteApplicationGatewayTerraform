@@ -25,6 +25,7 @@ module "virtual_network" {
       service_endpoints               = ["Microsoft.KeyVault"]
 
       network_security_group = { id = module.nsg.resource_id }
+      route_table            = { id = module.rt.resource_id }
     }
   }
 }

@@ -4,7 +4,7 @@ locals {
 }
 
 locals {
-  resource_type_restrictions = {
+  base_resource_type_restrictions = {
     uami = {
       max_length                 = 128
       lowercase                  = false
@@ -41,6 +41,15 @@ locals {
       allowed_segment_separators = ["-", "_", "."]
     }
   }
+
+  additional_resource_type_restrictions = {
+    rt = local.base_resource_type_restrictions.nsg
+  }
+
+  resource_type_restrictions = merge(
+    local.base_resource_type_restrictions,
+    local.additional_resource_type_restrictions
+  )
 
   short_regions = {
     australiacentral       = "acl"

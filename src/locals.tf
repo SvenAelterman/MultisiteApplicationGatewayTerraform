@@ -17,4 +17,5 @@ locals {
   vnet_name = length(var.vnet_name) == 0 ? module.vnet_name.resource_name : var.vnet_name
   agw_name  = length(var.agw_name) == 0 ? module.agw_name.resource_name : var.agw_name
   nsg_name  = length(var.nsg_name) == 0 ? module.nsg_name.resource_name : var.nsg_name
+  rt_name   = length(var.rt_name) == 0 ? module.rt_name.resource_name : var.rt_name
 }

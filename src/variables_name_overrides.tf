@@ -21,3 +21,9 @@ variable "nsg_name" {
   type        = string
   default     = ""
 }
+
+variable "rt_name" {
+  description = "The name of the Route Table. This overrides the automatically generated name based on the naming convention."
+  type        = string
+  default     = ""
+}
