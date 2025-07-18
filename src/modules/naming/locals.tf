@@ -35,6 +35,11 @@ locals {
       lowercase                  = false
       allowed_segment_separators = ["-", "_", "."]
     }
+    nsg = {
+      max_length                 = 80
+      lowercase                  = false
+      allowed_segment_separators = ["-", "_", "."]
+    }
   }
 
   short_regions = {

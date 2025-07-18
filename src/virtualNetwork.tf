@@ -1,7 +1,8 @@
 locals {
   vnet_address_cidr = tonumber(split("/", var.vnet_address_space[0])[1])
 
-  virtual_network_connection_name = "vwan-connection-${var.workload_name}-${var.location}"
+  virtual_network_connection_name           = "vwan-connection-${var.workload_name}-${var.location}"
+  application_gateway_subnet_address_prefix = cidrsubnet(var.vnet_address_space[0], var.applicationgatewaysubnet_cidr - local.vnet_address_cidr, 0)
 }
 
 module "virtual_network" {
@@ -20,8 +21,10 @@ module "virtual_network" {
     application_gateway_subnet = {
       name                            = "ApplicationGatewaySubnet"
       default_outbound_access_enabled = false
-      address_prefixes                = [cidrsubnet(var.vnet_address_space[0], var.applicationgatewaysubnet_cidr - local.vnet_address_cidr, 0)]
+      address_prefixes                = [local.application_gateway_subnet_address_prefix]
       service_endpoints               = ["Microsoft.KeyVault"]
+
+      network_security_group = { id = module.nsg.resource_id }
     }
   }
 }

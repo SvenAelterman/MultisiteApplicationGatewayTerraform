@@ -77,3 +77,16 @@ module "agw_name" {
   always_use_short_region_name = var.always_use_short_region_name
   instance_formatted_length    = var.instance_formatted_length
 }
+
+module "nsg_name" {
+  source = "./modules/naming"
+
+  workload_name = var.workload_name
+  environment   = var.environment
+  instance      = var.instance
+  region        = var.location
+  resource_type = "nsg"
+
+  always_use_short_region_name = var.always_use_short_region_name
+  instance_formatted_length    = var.instance_formatted_length
+}
