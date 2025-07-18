@@ -35,7 +35,7 @@ module "vwan_hub_connection" {
   virtual_network_connections = {
     connection = {
       name                      = local.virtual_network_connection_name
-      remote_virtual_network_id = module.virtual_network.id
+      remote_virtual_network_id = module.virtual_network.resource_id
       virtual_hub_id            = var.virtual_hub_id
       // Do not propagate 0/0 to this connection, the App GW must have direct Internet egress
       internet_security_enabled = false
