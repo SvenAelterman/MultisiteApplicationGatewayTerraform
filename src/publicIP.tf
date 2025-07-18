@@ -9,4 +9,6 @@ module "public_ip_address" {
   enable_telemetry    = var.enable_telemetry
 
   domain_name_label = local.pip_domain_name_label
+
+  diagnostic_settings = local.diagnostic_settings
 }

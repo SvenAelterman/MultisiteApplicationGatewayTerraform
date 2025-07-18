@@ -2,21 +2,23 @@ locals {
   port_name_https                       = "port-443"
   port_name_http                        = "port-80"
   cert_name                             = "cert-${var.workload_name}"
-  frontend_ip_configuration_public_name = "frontend-public"
+  frontend_ip_configuration_public_name = replace(module.agw_component_name_structure.resource_name, "{resource_type}", "PIP")
 }
 
 locals {
   // Create the object structure for the backend_address_pools variable for the module
   backend_address_pools = { for name, pool in var.agw_configuration.backend_pools :
-    name => merge({
-      for key, value in pool : key => value
-    }, { name : name })
+    name => {
+      name         = replace(module.agw_component_name_structure.resource_name, "{resource_type}", "BEP-${pool.name}")
+      ip_addresses = pool.ip_addresses != null ? pool.ip_addresses : []
+      fqdns        = pool.fqdns != null ? pool.fqdns : []
+    }
   }
 
   // Create the object structure for the backend_http_settings variable for the module
   backend_http_settings = { for name, listener in var.agw_configuration.listeners :
     name => {
-      name : "${name}-backend-setting"
+      name                  = replace(module.agw_component_name_structure.resource_name, "{resource_type}", "BES-${name}")
       cookie_based_affinity = "Disabled"
       port                  = coalesce(listener.backend_port, 443)
       protocol              = "Https"
@@ -40,7 +42,7 @@ locals {
   // Create the object structure for the backend_http_settings variable for the module
   https_listeners = { for name, listener in var.agw_configuration.listeners :
     "${name}-${listener.protocol}" => {
-      name : "${name}-${listener.protocol}-listener"
+      name : replace(module.agw_component_name_structure.resource_name, "{resource_type}", "LSN-${name}-${listener.protocol}")
       protocol                       = listener.protocol
       host_name                      = listener.frontend_host_name
       frontend_port_name             = listener.protocol == "Https" ? local.port_name_https : local.port_name_http
@@ -51,7 +53,7 @@ locals {
 
   http_listeners = { for name, listener in var.agw_configuration.listeners :
     "${name}-http" => {
-      name : "${name}-http-listener"
+      name                           = replace(module.agw_component_name_structure.resource_name, "{resource_type}", "LSN-${name}-http")
       protocol                       = "Http"
       host_name                      = listener.frontend_host_name
       frontend_port_name             = local.port_name_http
@@ -65,7 +67,7 @@ locals {
 
   request_routing_rules = { for name, listener in var.agw_configuration.listeners :
     "${name}-${listener.protocol}-routing" => {
-      name                       = "${name}-${listener.protocol}-rr"
+      name                       = replace(module.agw_component_name_structure.resource_name, "{resource_type}", "Rules-${name}-${listener.protocol}")
       http_listener_name         = local.all_listeners["${name}-${listener.protocol}"].name
       backend_address_pool_name  = local.backend_address_pools[listener.backend_pool].name
       backend_http_settings_name = local.backend_http_settings[name].name
@@ -76,7 +78,7 @@ locals {
 
   request_redirect_rules = { for name, listener in var.agw_configuration.listeners :
     "${name}-http-redirect" => {
-      name                        = "${name}-http-redirect-rr"
+      name                        = replace(module.agw_component_name_structure.resource_name, "{resource_type}", "Rules-${name}-http")
       http_listener_name          = local.http_listeners["${name}-http"].name
       redirect_configuration_name = local.redirect_configuration[name].name
       priority                    = 50 + index(local.listener_array, name)
@@ -91,7 +93,7 @@ locals {
 
   redirect_configuration = { for name, listener in var.agw_configuration.listeners :
     name => {
-      name                 = "${name}-http-redirect"
+      name                 = replace(module.agw_component_name_structure.resource_name, "{resource_type}", "Redirect-${name}")
       redirect_type        = "Permanent"
       include_path         = true
       include_query_string = true
@@ -113,6 +115,43 @@ locals {
   }
 }
 
+/*******************************************************************************
+APPLICATION GATEWAY WAF POLICY
+*******************************************************************************/
+
+module "application_gateway_waf_policy" {
+  source  = "Azure/avm-res-network-applicationgatewaywebapplicationfirewallpolicy/azurerm"
+  version = "~> 0.1.0"
+
+  name                = local.agw_waf_name
+  resource_group_name = module.resource_group.name
+  location            = module.resource_group.resource.location
+  tags                = var.tags
+  enable_telemetry    = var.enable_telemetry
+
+  policy_settings = {
+    enabled                                   = true
+    file_upload_limit_enforcement             = true
+    file_upload_limit_in_mb                   = 100
+    mode                                      = var.agw_waf_mode
+    js_challenge_cookie_expiration_in_minutes = 30
+  }
+
+  managed_rules = {
+    managed_rule_set = {
+      rule_set_1 = {
+        type    = "OWASP" # This is default but here for clarity
+        version = "3.2"
+        enabled = false
+      }
+    }
+  }
+}
+
+/*******************************************************************************
+APPLICATION GATEWAY
+*******************************************************************************/
+
 module "application_gateway" {
   source  = "Azure/avm-res-network-applicationgateway/azurerm"
   version = "~> 0.4.2"
@@ -131,6 +170,10 @@ module "application_gateway" {
   }
 
   frontend_ip_configuration_public_name = local.frontend_ip_configuration_public_name
+
+  app_gateway_waf_policy_resource_id = var.application_gateway_sku == "WAF_v2" ? module.application_gateway_waf_policy.resource_id : null
+
+  diagnostic_settings = local.diagnostic_settings
 
   # WAF : Azure Application Gateways v2 are always deployed in a highly available fashion with multiple instances by default. Enabling autoscale ensures the service is not reliant on manual intervention for scaling.
   sku = {

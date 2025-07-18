@@ -27,3 +27,15 @@ variable "rt_name" {
   type        = string
   default     = ""
 }
+
+variable "agw_waf_name" {
+  description = "The name of the Application Gateway WAF. This overrides the automatically generated name based on the naming convention."
+  type        = string
+  default     = ""
+}
+
+variable "rg_name" {
+  description = "The name of the Resource Group. This overrides the automatically generated name based on the naming convention."
+  type        = string
+  default     = ""
+}

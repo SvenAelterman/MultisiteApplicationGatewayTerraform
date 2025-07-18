@@ -11,6 +11,8 @@ module "keyvault" {
   tenant_id = data.azurerm_client_config.current.tenant_id
   sku_name  = "standard"
 
+  diagnostic_settings = local.diagnostic_settings
+
   role_assignments = {
     uami_kvsu = {
       principal_id               = module.uami.principal_id
@@ -22,6 +24,10 @@ module "keyvault" {
       role_definition_id_or_name = "Key Vault Administrator"
       principal_type             = "User"
     }
+  }
+
+  wait_for_rbac_before_secret_operations = {
+    create = "30s"
   }
 
   network_acls = {

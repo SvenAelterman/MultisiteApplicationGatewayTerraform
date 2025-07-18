@@ -17,6 +17,8 @@ module "virtual_network" {
 
   address_space = var.vnet_address_space
 
+  diagnostic_settings = local.diagnostic_settings
+
   subnets = {
     application_gateway_subnet = {
       name                            = "ApplicationGatewaySubnet"

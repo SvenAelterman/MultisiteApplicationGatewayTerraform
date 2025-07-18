@@ -5,45 +5,47 @@ locals {
 
 locals {
   base_resource_type_restrictions = {
-    uami = {
+    UAMI = {
       max_length                 = 128
       lowercase                  = false
       allowed_segment_separators = ["-", "_"]
     }
-    rg = {
+    RG = {
       max_length                 = 90
       lowercase                  = false
       allowed_segment_separators = ["-", "_", "."]
     }
-    pip = {
+    PIP = {
       max_length                 = 80
       lowercase                  = false
       allowed_segment_separators = ["-", "_", "."]
     }
-    kv = {
+    KV = {
       max_length                 = 24
       lowercase                  = false
       allowed_segment_separators = ["-"]
     }
-    vnet = {
+    VNET = {
       max_length                 = 64
       lowercase                  = false
       allowed_segment_separators = ["-", "_", "."]
     }
-    agw = {
+    NSG = {
       max_length                 = 80
       lowercase                  = false
       allowed_segment_separators = ["-", "_", "."]
     }
-    nsg = {
+    Diag = {
       max_length                 = 80
       lowercase                  = false
-      allowed_segment_separators = ["-", "_", "."]
+      allowed_segment_separators = ["-"]
     }
   }
 
   additional_resource_type_restrictions = {
-    rt = local.base_resource_type_restrictions.nsg
+    AGW     = local.base_resource_type_restrictions.NSG
+    RT      = local.base_resource_type_restrictions.NSG
+    WFRules = local.base_resource_type_restrictions.NSG
   }
 
   resource_type_restrictions = merge(

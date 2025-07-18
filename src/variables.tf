@@ -119,6 +119,7 @@ variable "agw_configuration" {
       fqdns                        = optional(list(string), [])
       ip_addresses                 = optional(list(string), [])
       backend_cert_public_key_file = optional(string, "")
+      name                         = string
     }))
   })
   default = {
@@ -137,6 +138,7 @@ variable "agw_configuration" {
 
     backend_pools = {
       first_pool = {
+        name  = "sample"
         fqdns = ["internal.example.com"]
         // -- OR --
         ip_addresses = ["10.0.1.4"]
@@ -162,5 +164,16 @@ variable "dns_resource_group_name" {
 
 variable "virtual_hub_id" {
   description = "The ID of the vWAN Virtual Hub to connect the new Virtual Network to."
+  type        = string
+}
+
+variable "agw_waf_mode" {
+  description = "The mode of the Application Gateway Web Application Firewall (WAF)."
+  type        = string
+  default     = "Prevention"
+}
+
+variable "log_analytics_workspace_id" {
+  description = "The ID of the Log Analytics Workspace for Application Gateway diagnostics."
   type        = string
 }

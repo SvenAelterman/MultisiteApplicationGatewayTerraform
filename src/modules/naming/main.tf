@@ -39,6 +39,7 @@ locals {
   ), "{sub_workload_name}", var.sub_workload_name)
 
   // TODO: Calculate how many characters (if any) still need to be removed from the short resource name
+  // TODO: Implement lowercase requirement
 
   final_resource_name = substr(length(local.initial_resource_name) > local.resource_type_restrictions[var.resource_type].max_length ? local.initial_short_resource_name : local.initial_resource_name, 0, local.resource_type_restrictions[var.resource_type].max_length)
 }
