@@ -16,6 +16,9 @@ module "virtual_network" {
   enable_telemetry    = var.enable_telemetry
 
   address_space = var.vnet_address_space
+  dns_servers = {
+    dns_servers = var.custom_dns_servers
+  }
 
   diagnostic_settings = local.diagnostic_settings
 

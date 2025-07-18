@@ -177,3 +177,9 @@ variable "log_analytics_workspace_id" {
   description = "The ID of the Log Analytics Workspace for Application Gateway diagnostics."
   type        = string
 }
+
+variable "custom_dns_servers" {
+  description = "List of custom DNS servers to be used by the Virtual Network."
+  type        = list(string)
+  default     = []
+}
