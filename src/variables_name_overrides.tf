@@ -9,3 +9,15 @@ variable "vnet_name" {
   type        = string
   default     = ""
 }
+
+variable "agw_name" {
+  description = "The name of the Application Gateway. This overrides the automatically generated name based on the naming convention."
+  type        = string
+  default     = ""
+}
+
+variable "nsg_name" {
+  description = "The name of the Network Security Group. This overrides the automatically generated name based on the naming convention."
+  type        = string
+  default     = ""
+}
