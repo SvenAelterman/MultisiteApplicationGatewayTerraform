@@ -5,7 +5,7 @@ locals {
 
   instance_formatted = format("%0${var.instance_formatted_length}d", var.instance)
 
-  pip_domain_name_label = length(var.pip_domain_name_label) > 0 ? var.pip_domain_name_label : "${var.workload_name}-${var.environment}-${local.instance_formatted}"
+  pip_domain_name_label = length(var.pip_domain_name_label) > 0 ? lower(var.pip_domain_name_label) : lower("${var.workload_name}-${var.environment}-${local.instance_formatted}")
 
   diagnostic_settings = {
     setting = {
